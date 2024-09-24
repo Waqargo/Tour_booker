@@ -1,0 +1,95 @@
+<!doctype html>
+
+<html lang="en"> 
+
+ <head> 
+
+  <meta charset="UTF-8"> 
+
+  <title>Add Bookings</title> 
+
+  <link rel="stylesheet" href="css/addbooking.css"> 
+
+ </head> 
+
+ <body> <!-- partial:index.partial.html --> 
+
+  <section> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> 
+
+    <div class="signin"> 
+        
+        <div class="content"> 
+            
+            <h2>Users details</h2> 
+            <div class="form"> 
+             <form action="/addBookings" method="POST">
+
+                <div class="inputBox">
+                    <input type="text" name="name" required>
+                    <i>Name</i>
+                  </div>
+                  <div class="inputBox">
+                    <select name="vehicleType" required>
+                      <option value="" disabled selected>Select Vehicle Type</option>
+                      <option value="Minivan">Minivan</option>
+                      <option value="Hiace">Hiace</option>
+                      <option value="Toyota Cross">Toyota Cross</option>
+                    </select>
+                    <i></i>
+                  </div>
+                  
+                  <div class="inputBox">
+                    <input type="text" name="address" >
+                    <i>Address</i>
+                  </div>
+                  <div class="inputBox">
+                    <input type="text" name="phoneNumber" required>
+                    <i>Phone Number</i>
+                  </div>
+                  <div class="inputBox">
+                    <input type="number" name="amount" required min="0" step="1">
+                    <i>Amount in Dollars</i>
+                  </div>
+                  <div class="inputBox">
+                    <input type="date" name="tourDate" required> <i>  </i>
+                  </div>
+
+
+                  <% if (user.role === 'driver') { %>
+                    
+                    <div class="inputBox">
+                      <input type="text" name="driverRequirement" > <i>Driver's Requirement</i>
+                    </div>
+                    
+                  <% } %>
+                  <div class="inputBox">
+                    <select name="tourTime" required>
+                      <option value="" disabled selected>Select Tour Time</option>
+                      <option value="07:00">7:00 AM</option>
+                      <option value="07:30">7:30 AM</option>
+                      <option value="08:00">8:00 AM</option>
+                      <option value="09:00">9:00 AM</option>
+                    </select>
+                    <i></i>
+                  </div>
+                  <div class="inputBox">
+                    <input type="submit" value="Submit">
+                  </div>
+      </form>
+      <p style="color:white">
+        <a href="javascript:history.back()" style="color:white" class="back-link">Go Back</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/" style="color:white" class="home-link">Go Home</a>
+      </p>
+      
+    </div>
+     </div> 
+
+    </div> 
+
+   </div> 
+
+  </section> <!-- partial --> 
+
+ </body>
+
+</html>

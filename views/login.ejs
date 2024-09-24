@@ -1,0 +1,96 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="css/addbooking.css">
+</head>
+<nav class="navbar navbar-expand-lg navbar-light "></nav>
+  <a class="navbar-brand" href="#">Btc Japan Tour</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ">
+      <!-- Static Links -->
+      <li class="nav-item">
+        <a class="nav-link text-light" href="/">Home</a>
+      </li>
+      
+      <!-- Dynamic Links based on user role -->
+      <% if (user) { %>
+        <li class="nav-item">
+          <a class="nav-link text-light" href="/profile">Profile</a>
+        </li>
+        
+        <% if (user.role === 'admin') { %>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="/users">Manage Users</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="/addBookings">Add Booking</a>
+          </li>
+        <% } %>
+        
+        <% if (user.role !== 'user') { %>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="/bookingsList">Bookings List</a>
+          </li>
+        <% } %>
+        
+        <li class="nav-item">
+          <a class="nav-link text-light" href="/logout">Logout</a>
+        </li>
+      <% } else { %>
+        <!-- If user is not logged in -->
+        <li class="nav-item">
+          <a class="nav-link text-light" href="/register">Register</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light" href="/login">Login</a>
+        </li>
+      <% } %>
+    </ul>
+  </div>
+</nav>
+<body>
+  
+  <section> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> 
+
+    <div class="signin">
+      <div class="content">
+        <h2>Login</h2>
+        <div class="form">
+          <form action="/login" method="POST">
+  
+            <div class="inputBox">
+              <input type="email" name="email" id="email" required />
+              <i>Email/Username</i>
+            </div>
+            <div class="inputBox">
+              <input type="password" name="password" id="password" required />
+              <i>Password</i>
+            </div>
+            <div class="inputBox">
+              <input type="submit" value="Login" class="submit" />
+            </div>
+  
+          </form>
+          <div>
+            <p style="color: white;">
+              Dont have an account? <a href="/register" style="color:#9FBCC7">Register</a>
+            </p>
+            <p style="color: white;">
+              Want To Go Home <a href="/" style="color:#9FBCC7">Home</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
