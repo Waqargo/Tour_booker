@@ -147,24 +147,15 @@ app.get('/semi_admin', isAuthenticated, authRole("semi_admin"), async (req, res)
   res.send('Semi_admin Dashboard');
 });
 
-app.get('/Calender', isAuthenticated, authRole('admin'), async (req, res) => {
-  try {
-    // Assuming you have a Booking model to fetch bookings
-    const bookings = await Booking.find({}).select('tourDate'); // Adjust fields as needed
-    res.render('Calenderr', { bookings });
-  } catch (error) {
-    console.error(error);
-    res.render('Calenderr', { bookings: [] });
-  }
-});
+
 app.get('/Calenders', isAuthenticated, authRole('semi_admin'), async (req, res) => {
   try {
     // Assuming you have a Booking model to fetch bookings
     const bookings = await Booking.find({}).select('tourDate'); // Adjust fields as needed
-    res.render('Calenderr', { bookings });
+    res.render('Calender', { bookings });
   } catch (error) {
     console.error(error);
-    res.render('Calenderr', { bookings: [] });
+    res.render('Calender', { bookings: [] });
   }
 });
 
