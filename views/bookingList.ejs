@@ -33,8 +33,18 @@
               <button onclick="deleteBooking('<%= booking._id %>')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Delete</button>
           </div>
           <% } %>
+          <% if (user.role === 'semi-admin') { %>
+          <div class="flow" style="display: flex; justify-content: flex-end; gap: 15px;">
+              <button onclick="copyBookingInfo('<%= booking._id %>')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Copy</button>
+             </div>
+          <% } %>
           <p class="traveller-name"><strong>Traveller Name:</strong> <%= booking.name %></p>
-          <p class="tour-date"><strong>Tour Date:</strong> <%= booking.tourDate ? new Date(booking.tourDate).toLocaleDateString() : 'N/A' %></p>
+          <p class="tour-date"><strong>Tour Date:</strong> 
+            <%= booking.tourDate 
+                  ? new Date(booking.tourDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                  : 'N/A' %>
+          </p>
+          
           <p class="tour-time"><strong>Tour Time:</strong> <%= booking.tourTime %></p>
           <p class="vehicle-type"><strong>Vehicle Type:</strong> <%= booking.vehicleType %></p>
           <p class="address" style="max-width: 100%; word-wrap: break-word;"><strong>Address:</strong> <%= booking.address %></p>
