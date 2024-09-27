@@ -147,7 +147,6 @@ app.get('/semi_admin', isAuthenticated, authRole("semi_admin"), async (req, res)
   res.send('Semi_admin Dashboard');
 });
 
-
 app.get('/Calender', isAuthenticated, authRole('admin'), async (req, res) => {
   try {
     // Assuming you have a Booking model to fetch bookings
