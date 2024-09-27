@@ -284,7 +284,7 @@ app.get('/getBookingsByDateRange', async (req, res) => {
 
 
 
-app.get('/bookingsList', isAuthenticated, authRole('admin', 'semi_admin', 'driver'), async (req, res, next) => {
+app.get('/bookingsList', isAuthenticated, authRole('admin'), async (req, res, next) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set to start of today
@@ -316,7 +316,7 @@ app.get('/bookingsList', isAuthenticated, authRole('admin', 'semi_admin', 'drive
     });
   }
 });
-app.get('/bookingList', isAuthenticated, authRole('semi_admin', 'driver'), async (req, res, next) => {
+app.get('/bookingList', isAuthenticated, authRole('semi_admin'), async (req, res, next) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set to start of today
@@ -353,7 +353,7 @@ app.get('/bookingList', isAuthenticated, authRole('semi_admin', 'driver'), async
 
 
 
-app.delete('/deleteBooking/:id', async (req, res) => {
+app.delete('/deleteBooking/:id',isAuthenticated, authRole('admin'), async (req, res) => {
   try {
     const bookingId = req.params.id;
     await Booking.findByIdAndDelete(bookingId);
@@ -365,7 +365,7 @@ app.delete('/deleteBooking/:id', async (req, res) => {
 });
 
 
-app.get('/editBooking/:id', async (req, res) => {
+app.get('/editBooking/:id',isAuthenticated, authRole('admin'), async (req, res) => {
   try {
     const bookingId = req.params.id;
     const booking = await Booking.findById(bookingId);
