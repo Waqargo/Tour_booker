@@ -30,23 +30,21 @@
     <div class="js-animsition animsition" id="site-wrap" data-animsition-in-class="fade-in" data-animsition-out-class="fade-out">
     
         <header class="site-header">
-            <%- include('./layouts/header') %>
-          </header>
-          
-          
-          
-          
-          
-          
+            <%- include('./layouts/header') %> 
 
-          
+          </header>
+
     <!-- END head -->
 
     <section class="site-hero overlay" style="background-image: url(images/hero_1.jpg)">
       <div class="container">
         <div class="row site-hero-inner justify-content-center align-items-center">
           <div class="col-md-10 text-center">
-            <h1 class="heading mb-4" data-aos="fade-up">Travel &amp; Tours</h1>
+            <% if (user.role === 'client') { %>
+              <h1 class="heading mb-4" data-aos="fade-up">Wait for the Admin To give you access</h1>
+            <% } else { %>
+              <h1 class="heading mb-4" data-aos="fade-up">Travel &amp; Tours</h1>
+            <% } %> 
             <p class="sub-heading mb-5" data-aos="fade-up" data-aos-delay="100">
               The Best website for data managemant
             </p>
