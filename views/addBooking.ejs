@@ -23,7 +23,16 @@
             <h2>Users details</h2> 
             <div class="form"> 
              <form action="/addBookings" method="POST">
-
+              <div class="inputBox">
+                <select name="tour" id="tour" required>
+                  <option value="" disabled selected>Select Tour</option>
+                  <option value="Mount Fuji">Mount Fuji</option>
+                  <option value="Nikko">Nikko</option>
+                  <option value="Tokyo">Tokyo</option>
+                </select>
+                <i></i> <!-- Optional icon or additional styling -->
+              </div>
+              
                 <div class="inputBox">
                     <input type="text" name="name" required>
                     <i>Name</i>
@@ -33,7 +42,9 @@
                       <option value="" disabled selected>Select Vehicle Type</option>
                       <option value="Minivan">Minivan</option>
                       <option value="Hiace">Hiace</option>
-                      <option value="Toyota Cross">Toyota Cross</option>
+                      <option value="Prius">Prius</option>
+                      <option value="Prado">Prado</option>
+                      <option value="Luxury Car">Luxury Car</option>
                     </select>
                     <i></i>
                   </div>
@@ -43,13 +54,21 @@
                     <i>Address</i>
                   </div>
                   <div class="inputBox">
+                    <input type="text" name="specialRequirements" id="specialRequirements" >
+                    <i>Special Requirements</i>
+                  </div>
+                  
+                  
+                  <div class="inputBox">
                     <input type="text" name="phoneNumber" required>
                     <i>Phone Number</i>
                   </div>
+                  
                   <div class="inputBox">
-                    <input type="number" name="amount" required min="0" step="1">
-                    <i>Amount in Dollars</i>
+                    <input type="number" name="totalPassengers" id="totalPassengers" min="1" required>
+                    <i>Total Number of Passengers</i>
                   </div>
+                  
                   <div class="inputBox">
                     <input type="date" name="tourDate" required> <i>  </i>
                   </div>
