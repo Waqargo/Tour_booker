@@ -25,9 +25,11 @@
             <a class="nav-link text-light" href="/bookingsList">Bookings List</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-light" href="/Calender"> Calender</a>
+            <a class="nav-link text-light" href="/Calender">Calender</a>
           </li>
-          
+          <li class="nav-item">
+            <a class="nav-link text-light" href="/TTour">Tours</a>
+          </li>
         <% } %>
         
         <% if (user && user.role === 'semi_admin') { %>
@@ -35,9 +37,17 @@
             <a class="nav-link text-light" href="/bookingList">Bookings List</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-light" href="/Calenders"> Calendar</a>
+            <a class="nav-link text-light" href="/Calenders">Calender</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="/TTours">Tours</a>
+          </li>
+        <% } %>
+        <% if (user && user.role === 'driver') { %>
           
+          <li class="nav-item">
+            <a class="nav-link text-light" href="/Driver_BookingList">Tours</a>
+          </li>
         <% } %>
         
        
