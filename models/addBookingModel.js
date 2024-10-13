@@ -27,23 +27,30 @@
       type: Date,
       default: Date.now,
     },
-    amount: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
+    
     tourDate: {
       type: Date,
       required: true,
     },
-    driverRequirement: {
-      type: String,
-      required: false,
-    },
+    
     tourTime: {
       type: String,
       required: false,
     },
+    tour: {
+      type: String,
+      required: true
+    },
+    specialRequirements: {
+      type: String,
+      default: 'No',
+      required: false
+    },
+    totalPassengers: {
+      type: Number,
+      required: false
+      
+    }
   });
 
   const Booking = mongoose.model('Booking', BookingSchema);
