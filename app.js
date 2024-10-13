@@ -168,9 +168,82 @@ app.get('/Calenders', isAuthenticated, authRole('semi_admin'), async (req, res) 
   }
 });
 
-app.get('/driver', isAuthenticated, authRole("driver"), async (req, res) => {
-  res.send('Driver Dashboard');
+
+
+
+app.get('/TTour', isAuthenticated,authRole('admin'), async (req, res) => {
+  try {
+    const bookings = await Booking.find(); // Assuming Booking is your Mongoose model
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to the start of today for accurate comparison
+
+    // Filter bookings for today and future dates
+    const futureBookings = bookings.filter(booking => {
+      const bookingDate = new Date(booking.tourDate); // Replace 'tourDate' with your date field name
+      return bookingDate >= today; // Include bookings for today and future
+    });
+
+    // Calculate total bookings and Hiace bookings
+    const totalBookings = futureBookings.length; // Total bookings for today and future
+    const hiaceBookingsCount = futureBookings.filter(booking => booking.vehicleType === 'Hiace').length; // Hiace bookings count
+
+    // Count bookings by vehicle type
+    const vehicleCounts = {
+      Minivan: futureBookings.filter(booking => booking.vehicleType === 'Minivan').length,
+      Hiace: hiaceBookingsCount,
+      Prius: futureBookings.filter(booking => booking.vehicleType === 'Prius').length,
+      Prado: futureBookings.filter(booking => booking.vehicleType === 'Prado').length,
+      'Luxury Car': futureBookings.filter(booking => booking.vehicleType === 'Luxury Car').length,
+    };
+
+    // Render the EJS file with the required data
+    res.render('tours', {
+      totalBookings,
+      hiaceBookingsCount,
+      vehicleCounts,
+    });
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
+app.get('/TTours', isAuthenticated,authRole('semi_admin'), async (req, res) => {
+  try {
+    const bookings = await Booking.find(); // Assuming Booking is your Mongoose model
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to the start of today for accurate comparison
+
+    // Filter bookings for today and future dates
+    const futureBookings = bookings.filter(booking => {
+      const bookingDate = new Date(booking.tourDate); // Replace 'tourDate' with your date field name
+      return bookingDate >= today; // Include bookings for today and future
+    });
+
+    // Calculate total bookings and Hiace bookings
+    const totalBookings = futureBookings.length; // Total bookings for today and future
+    const hiaceBookingsCount = futureBookings.filter(booking => booking.vehicleType === 'Hiace').length; // Hiace bookings count
+
+    // Count bookings by vehicle type
+    const vehicleCounts = {
+      Minivan: futureBookings.filter(booking => booking.vehicleType === 'Minivan').length,
+      Hiace: hiaceBookingsCount,
+      Prius: futureBookings.filter(booking => booking.vehicleType === 'Prius').length,
+      Prado: futureBookings.filter(booking => booking.vehicleType === 'Prado').length,
+      'Luxury Car': futureBookings.filter(booking => booking.vehicleType === 'Luxury Car').length,
+    };
+
+    // Render the EJS file with the required data
+    res.render('tours', {
+      totalBookings,
+      hiaceBookingsCount,
+      vehicleCounts,
+    });
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 
 app.get('/addBookings', isAuthenticated, authRole("admin"), async (req, res, next) => {
   res.render('addBooking');
@@ -178,7 +251,7 @@ app.get('/addBookings', isAuthenticated, authRole("admin"), async (req, res, nex
 
 app.post('/addBookings', isAuthenticated, authRole('admin'), async (req, res, next) => {
 try {
-  const { name, vehicleType, address, phoneNumber, amount, tourDate, driverPayment, tourTime } = req.body;
+  const { name, vehicleType, address, phoneNumber, tourDate, tourTime,tour, specialRequirements, totalPassengers } = req.body;
 
   // Remove phone number validation and date validation
   // The new booking will be created regardless of the input validity.
@@ -188,10 +261,11 @@ try {
     vehicleType,
     address,
     phoneNumber,
-    amount,
     tourDate,
     tourTime,
-    driverPayment,
+    tour,
+    specialRequirements,
+    totalPassengers
   });
 
   await newBooking.save();
@@ -257,24 +331,20 @@ app.get('/getBookingsByDate/:date', async (req, res) => {
 // Route to get bookings by date range
 app.get('/getBookingsByDateRange', async (req, res) => {
   const { start, end } = req.query;
-
   try {
       // Parse the start and end dates from query parameters
       const startDate = new Date(start);
       const endDate = new Date(end);
-
       // Set the start and end of the range
       const startOfRange = new Date(startDate.setHours(0, 0, 0, 0));
       const endOfRange = new Date(endDate.setHours(23, 59, 59, 999));
-
-      // Find bookings within the date range
+      // Find bookings within the date range and sort them in ascending order by tourDate
       const bookings = await Booking.find({
           tourDate: {
               $gte: startOfRange,
               $lte: endOfRange
           }
-      });
-
+      }).sort({ tourDate: 1 }); // 1 for ascending order
       res.json(bookings);
   } catch (error) {
       console.error("Error fetching bookings by date range:", error);
@@ -288,23 +358,13 @@ app.get('/bookingsList', isAuthenticated, authRole('admin'), async (req, res, ne
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set to start of today
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1); // Set to yesterday
 
-    // Fetch all bookings sorted by tourDate in ascending order
-    const bookings = await Booking.find({}).sort({ tourDate: 1 });
+    // Fetch all bookings for today and any day after today, sorted by tourDate in ascending order
+    const bookings = await Booking.find({ tourDate: { $gte: today } }).sort({ tourDate: 1 });
 
-    // Filter bookings into categories
-    const yesterdayBookings = bookings.filter(booking => new Date(booking.tourDate).toDateString() === yesterday.toDateString());
-    const todayBookings = bookings.filter(booking => new Date(booking.tourDate).toDateString() === today.toDateString());
-    const futureBookings = bookings.filter(booking => new Date(booking.tourDate) > today);
-
-    // Combine all relevant bookings for easier handling in the template
-    const relevantBookings = [...yesterdayBookings, ...todayBookings, ...futureBookings];
-
-    // Render the view with the required data
+    // Render the view with the filtered bookings
     res.render('bookingList', { 
-      bookings: relevantBookings, // Pass only relevant bookings
+      bookings: bookings, // Pass all relevant bookings
       totalBookings: bookings.length, // Total bookings count
     });
   } catch (error) {
@@ -316,33 +376,47 @@ app.get('/bookingsList', isAuthenticated, authRole('admin'), async (req, res, ne
     });
   }
 });
+
+
 app.get('/bookingList', isAuthenticated, authRole('semi_admin'), async (req, res, next) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set to start of today
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1); // Set to yesterday
 
-    // Fetch all bookings sorted by tourDate in ascending order
-    const bookings = await Booking.find({}).sort({ tourDate: 1 });
+    // Fetch all bookings for today and any day after today, sorted by tourDate in ascending order
+    const bookings = await Booking.find({ tourDate: { $gte: today } }).sort({ tourDate: 1 });
 
-    // Filter bookings into categories
-    const yesterdayBookings = bookings.filter(booking => new Date(booking.tourDate).toDateString() === yesterday.toDateString());
-    const todayBookings = bookings.filter(booking => new Date(booking.tourDate).toDateString() === today.toDateString());
-    const futureBookings = bookings.filter(booking => new Date(booking.tourDate) > today);
-
-    // Combine all relevant bookings for easier handling in the template
-    const relevantBookings = [...yesterdayBookings, ...todayBookings, ...futureBookings];
-
-    // Render the view with the required data
-    res.render('bookingList', { 
-      bookings: relevantBookings, // Pass only relevant bookings
+    // Render the view with the filtered bookings
+    res.render('bookingsList', { 
+      bookings: bookings, // Pass all relevant bookings
       totalBookings: bookings.length, // Total bookings count
     });
   } catch (error) {
     console.error(error);
     // Handle error by rendering an empty booking list
-    res.render('bookingList', { 
+    res.render('bookingsList', { 
+      bookings: [], 
+      totalBookings: 0 // Return empty arrays on error
+    });
+  }
+});
+app.get('/Driver_BookingList', isAuthenticated, authRole('driver'), async (req, res, next) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of today
+
+    // Fetch all bookings for today and any day after today, sorted by tourDate in ascending order
+    const bookings = await Booking.find({ tourDate: { $gte: today } }).sort({ tourDate: 1 });
+
+    // Render the view with the filtered bookings
+    res.render('Driver_BookingList', { 
+      bookings: bookings, // Pass all relevant bookings
+      totalBookings: bookings.length, // Total bookings count
+    });
+  } catch (error) {
+    console.error(error);
+    // Handle error by rendering an empty booking list
+    res.render('Driver_BookingList', { 
       bookings: [], 
       totalBookings: 0 // Return empty arrays on error
     });
