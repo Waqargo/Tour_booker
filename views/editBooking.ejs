@@ -15,6 +15,17 @@
         <div class="form"> 
           <form action="/updateBooking/<%= booking._id %>" method="POST">
             <div class="inputBox">
+              <select name="tour" id="tour" required>
+                <option value="" disabled selected>Select Tour</option>
+                <option value="Mount Fuji" <%= booking.tour === 'Mount Fuji' ? 'selected' : '' %> >Mount Fuji</option>
+                <option value="Nikko" <%= booking.tour === 'Nikko' ? 'selected' : '' %> >Nikko</option>
+                <option value="Tokyo" <%= booking.tour === 'Tokyo' ? 'selected' : '' %> >Tokyo</option>
+              </select>
+              <i></i> <!-- Optional icon or additional styling -->
+            </div>
+           
+
+            <div class="inputBox">
               <input type="text" name="name" value="<%= booking.name %>" required>
               <i>Name</i>
             </div>
@@ -23,7 +34,9 @@
                 <option value="" disabled>Select Vehicle Type</option>
                 <option value="Minivan" <%= booking.vehicleType === 'Minivan' ? 'selected' : '' %>>Minivan</option>
                 <option value="Hiace" <%= booking.vehicleType === 'Hiace' ? 'selected' : '' %>>Hiace</option>
-                <option value="Toyota Cross" <%= booking.vehicleType === 'Toyota Cross' ? 'selected' : '' %>>Toyota Cross</option>
+                <option value="Prius" <%= booking.vehicleType === 'Prius' ? 'selected' : '' %>>Prius</option>
+                <option value="Prado" <%= booking.vehicleType === 'Prado' ? 'selected' : '' %>>Prado</option>
+                <option value="Luxury Car" <%= booking.vehicleType === 'Luxury Car' ? 'selected' : '' %>>Luxury Car</option>
               </select>
               <i></i>
             </div>
@@ -32,12 +45,16 @@
               <i>Address</i>
             </div>
             <div class="inputBox">
+              <input type="text" name="specialRequirements" id="specialRequirements" value="<%= booking.specialRequirements %>">
+              <i>Special Requirements</i>
+            </div>
+            <div class="inputBox">
               <input type="text" name="phoneNumber" value="<%= booking.phoneNumber %>" required>
               <i>Phone Number</i>
             </div>
             <div class="inputBox">
-              <input type="number" name="amount" value="<%= booking.amount %>" required min="0" step="1">
-              <i>Amount in Dollars</i>
+              <input type="number" name="totalPassengers" id="totalPassengers" value="<%= booking.totalPassengers %>" min="1" required>
+              <i>Total Number of Passengers</i>
             </div>
             <div class="inputBox">
               <input type="date" name="tourDate" value="<%= booking.tourDate ? booking.tourDate.toISOString().split('T')[0] : '' %>" required>
