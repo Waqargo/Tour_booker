@@ -1,0 +1,221 @@
+<%- include('./layouts/header') %>
+
+<div class="contain" style="background-color: #222222; color: #9FBCC7; margin-top: -20px; padding: 20px;">
+  <h1>Bookings List</h1>
+  <h4>Total number of bookings: <span id="totalBookings"><%= totalBookings %></span></h4>
+
+  <!-- Buttons for actions -->
+  <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
+    <button onclick="getTomorrowBookings()" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 50px;">Tomorrow's Bookings</button>
+    <button onclick="toggleCustomDateRange()" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 50px;">Custom Date Range</button>
+    <button onclick="refreshPage()" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 50px;">Refresh Page</button>
+
+  </div>
+
+  <!-- Custom Date Range Selection -->
+  <div id="custom-date-range" style="display: none; margin-bottom: 20px;">
+    <input type="date" id="start-date" />
+    <input type="date" id="end-date" />
+    <button onclick="getCustomBookings()" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Find Bookings</button>
+  </div>
+
+  <div class="bookings-container" style="width: 80%; gap: 20px;">
+    <% if (bookings.length === 0) { %>
+      <p>No bookings available.</p>
+    <% } else { %>
+      <% bookings.forEach(booking => { %>
+        <div class="booking-card" id="booking-<%= booking._id %>" style="border: 3px solid rgb(255, 255, 255); width: 100%; padding: 20px; border-radius: 20px;">
+          
+          <div class="flow" style="display: flex; justify-content: flex-end; gap: 15px;">
+              <button onclick="copyBookingInfo('<%= booking._id %>')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Copy</button>
+              </div>
+          
+          
+          <h4 class="tour"><strong>Tour:</strong> <%= booking.tour %></h4>
+          <p class="traveller-name"><strong>Traveller Name:</strong> <%= booking.name %></p>
+          <p class="tour-date"><strong>Tour Date:</strong> 
+            <%= booking.tourDate 
+                  ? new Date(booking.tourDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                  : 'N/A' %>
+          </p>
+          
+          <p class="tour-time"><strong>Tour Time:</strong> <%= booking.tourTime %></p>
+          <p class="vehicle-type"><strong>Vehicle Type:</strong> <%= booking.vehicleType %></p>
+          <p class="address" style="max-width: 100%; word-wrap: break-word;"><strong>Address:</strong> <%= booking.address %></p>
+          <p class="phone-number"><strong>Phone Number:</strong> <%= booking.phoneNumber %></p>
+          <p class="specialRequirements" style="max-width: 100%; word-wrap: break-word;"><strong>Special Requirements:</strong> <%= booking.specialRequirements %></p>
+          <p class="totalPassengers"><strong>Total Passengers:</strong> <%= booking.totalPassengers %></p>
+          
+          <% if (user.role === 'driver') { %>
+            <p class="drivers-payment"><strong>Drivers Payment:</strong> $<%= booking.driverPayment %></p>
+            
+          <% } %>
+          <p><strong>Date:</strong> <%= new Date(booking.createdAt).toLocaleDateString() %></p>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  function copyBookingInfo(bookingId) {
+    const bookingCard = document.getElementById(`booking-${bookingId}`);
+
+    // Collecting the booking details
+    const tour = bookingCard.querySelector('.tour').innerText.split(': ')[1];
+    const name = bookingCard.querySelector('.traveller-name').innerText.split(': ')[1];
+    const tourDate = bookingCard.querySelector('.tour-date').innerText.split(': ')[1];
+    const tourTime = bookingCard.querySelector('.tour-time').innerText.split(': ')[1];
+    const vehicleType = bookingCard.querySelector('.vehicle-type').innerText.split(': ')[1];
+    const address = bookingCard.querySelector('.address').innerText.split(': ')[1];
+    const phoneNumber = bookingCard.querySelector('.phone-number').innerText.split(': ')[1];
+    const specialRequirements = bookingCard.querySelector('.specialRequirements').innerText.split(': ')[1] || 'N/A';
+    const totalPassengers = bookingCard.querySelector('.totalPassengers').innerText.split(': ')[1];
+
+    // Creating the formatted booking information
+    const bookingInfo = `
+Tour: ${tour}
+Traveller Name: ${name}
+
+Tour Date: ${tourDate}
+Tour Time: ${tourTime}
+Vehicle Type: ${vehicleType}
+Address: ${address}
+Phone Number: ${phoneNumber}
+Special Requirements: ${specialRequirements}
+Total Passengers: ${totalPassengers}
+    `;
+
+    // Copying the text to clipboard
+    navigator.clipboard.writeText(bookingInfo).then(() => {
+        alert('Booking information copied to clipboard!');
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+    });
+}
+
+
+
+  function deleteBooking(bookingId) {
+    if (confirm("Are you sure you want to delete this booking?")) {
+      fetch(`/deleteBooking/${bookingId}`, {
+        method: "DELETE",
+      })
+      .then((response) => {
+        if (response.ok) {
+          alert("Booking deleted successfully");
+          document.getElementById(`booking-${bookingId}`).remove();
+          updateBookingCount(-1); // Update booking count after deletion
+        } else {
+          alert("Error deleting booking");
+        }
+      })
+      .catch((err) => console.error("Error:", err));
+    }
+  }
+
+  function getTomorrowBookings() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const formattedDate = tomorrow.toISOString().split('T')[0];
+
+    // Fetch tomorrow's bookings
+    fetch(`/getBookingsByDate/${formattedDate}`)
+      .then(response => response.json())
+      .then(bookings => {
+        clearBookings();
+        if (bookings.length === 0) {
+          document.querySelector('.bookings-container').innerHTML = '<h1>There are no bookings</h1>';
+          document.getElementById('totalBookings').innerText = '0'; // Update count to 0
+        } else {
+          bookings.forEach(booking => displayBooking(booking));
+        }
+      })
+      .catch(err => console.error('Error fetching bookings:', err));
+  }
+
+  function toggleCustomDateRange() {
+    const customDateRange = document.getElementById('custom-date-range');
+    customDateRange.style.display = customDateRange.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function getCustomBookings() {
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+
+    if (!startDate) {
+      alert("Please select a start date.");
+      return;
+    }
+
+    // Validate the date range
+    if (endDate && new Date(startDate) > new Date(endDate)) {
+      alert("The start date cannot be after the end date.");
+      return;
+    }
+
+    // Fetch bookings by date range
+    let url = `/getBookingsByDateRange?start=${startDate}`;
+    if (endDate) {
+      url += `&end=${endDate}`;
+    }
+
+    fetch(url)
+      .then(response => response.json())
+      .then(bookings => {
+        clearBookings();
+        if (bookings.length === 0) {
+          document.querySelector('.bookings-container').innerHTML = '<h1>There are no bookings</h1>';
+          document.getElementById('totalBookings').innerText = '0'; // Update count to 0
+        } else {
+          bookings.forEach(booking => displayBooking(booking));
+        }
+      })
+      .catch(err => console.error('Error fetching bookings:', err));
+  }
+
+  function clearBookings() {
+    const container = document.querySelector('.bookings-container');
+    container.innerHTML = ''; // Clear current bookings
+    document.getElementById('totalBookings').innerText = '0'; // Reset total bookings count
+  }
+
+  function refreshPage() {
+    location.reload(); // Reloads the current page
+}
+
+
+function displayBooking(booking) {
+  const container = document.querySelector('.bookings-container');
+  
+  // Define options for the date formatting
+  const options = { day: '2-digit', month: 'short', year: 'numeric' };
+  
+  const bookingCard = `
+    <div class="booking-card" id="booking-${booking._id}" style="border: 3px solid black; width: 100%; padding: 20px; border-radius: 20px;">
+      <div class="flow" style="display: flex; justify-content: flex-end; gap: 15px;">
+        <button onclick="copyBookingInfo('${booking._id}')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Copy</button>
+        </div>
+      <h4 class="tour"><strong>Tour:</strong> ${booking.tour}</h4>
+      <p class="traveller-name"><strong>Traveller Name:</strong> ${booking.name}</p>
+      <p class="tour-date"><strong>Tour Date:</strong> ${booking.tourDate ? new Date(booking.tourDate).toLocaleDateString('en-GB', options) : 'N/A'}</p>
+      <p class="tour-time"><strong>Tour Time:</strong> ${booking.tourTime}</p>
+      <p class="vehicle-type"><strong>Vehicle Type:</strong> ${booking.vehicleType}</p>
+      <p class="address" style="max-width: 100%; word-wrap: break-word;"><strong>Address:</strong> ${booking.address}</p>
+      <p class="phone-number"><strong>Phone Number:</strong> ${booking.phoneNumber}</p>
+      <p class="specialRequirements" style="max-width: 100%; word-wrap: break-word;"><strong>Special Requirements:</strong> ${booking.specialRequirements || 'N/A'}</p>
+      <p class="totalPassengers"><strong>Total Passengers:</strong> ${booking.totalPassengers}</p>
+      <p><strong>Date:</strong> ${new Date(booking.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+    </div>
+  `;
+  
+  container.insertAdjacentHTML('beforeend', bookingCard);
+  
+  // Update total bookings count
+  const totalBookingsElement = document.getElementById('totalBookings');
+  totalBookingsElement.innerText = parseInt(totalBookingsElement.innerText) + 1;
+}
+
+</script>
+
+<%- include('./layouts/footer') %>

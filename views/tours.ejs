@@ -1,0 +1,15 @@
+<%- include('./layouts/header') %>
+
+<div class="contain" style="background-color: #222222; color: #9FBCC7; padding: 20px;">
+  <h1>Number of Bookings </h1>
+  <h4>Total number of bookings (Today and Future): <span id="totalBookings"><%= totalBookings %></span></h4>
+  <h4>Total Hiace bookings: <span id="hiaceBookingsCount"><%= hiaceBookingsCount %></span></h4>
+  <h4>Total Minivan bookings: <span id="hiaceBookingsCount"><%= vehicleCounts.Minivan %></span></h4>
+  <h4>Total Prius bookings: <span id="hiaceBookingsCount"><%= vehicleCounts.Prius %></span></h4>
+  <h4>Total Prado bookings: <span id="hiaceBookingsCount"><%= vehicleCounts.Prado %></span></h4>
+  <h4>Total Luxury Car bookings: <span id="hiaceBookingsCount"><%= vehicleCounts["Luxury Car"] %></span></h4>
+
+ 
+</div>
+
+<%- include('./layouts/footer') %>
