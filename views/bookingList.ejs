@@ -63,7 +63,7 @@
           <p class="phone-number"><strong>Phone Number:</strong> <%= booking.phoneNumber %></p>
           <p class="Driver Name"><strong>Driver Name:</strong> <%= booking.driverName || 'N/A' %></p>
           <p class="earned"><strong>We earned:</strong> <%= booking.earned || 'N/A' %></p>
-          <p class="driverPrice"><strong>Driver Earned: </strong> <%= booking.driverPrice || 'N/A' %></p>
+          <p class="driverPrice"><strong>Driver Earned: $</strong> <%= booking.driverPrice || 'N/A' %></p>
           <p class="specialRequirements"><strong>Special Requirements:</strong> <%= booking.specialRequirements || 'N/A' %></p>
           <p class="totalPassengers"><strong>Total Passengers:</strong> <%= booking.totalPassengers %></p>
         </div>
@@ -265,9 +265,9 @@ Total Passengers: ${totalPassengers}
 
   function displayBooking(booking) {
     const container = document.querySelector('.bookings-container');
-
+  
     const options = { day: '2-digit', month: 'short', year: 'numeric' };
-
+  
     const bookingCard = `
       <div class="booking-card" id="booking-${booking._id}" style="border: 3px solid white; width: 100%; padding: 20px; border-radius: 20px; overflow-wrap: break-word;">
         <div class="flow" style="display: flex; justify-content: flex-end; flex-wrap: nowrap; gap: 15px;">
@@ -275,23 +275,27 @@ Total Passengers: ${totalPassengers}
           <button onclick="window.location.href='/editBooking/${booking._id}';" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Edit</button>
           <button onclick="deleteBooking('${booking._id}')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Delete</button>
         </div>
-        <h4 class="tour"><strong>Tour:</strong> ${booking.tour}</h4>
-        <p class="traveller-name"><strong>Traveller Name:</strong> ${booking.name}</p>
+        <h4 class="tour"><strong>Tour:</strong> ${booking.tour || 'N/A'}</h4>
+        <p class="traveller-name"><strong>Traveller Name:</strong> ${booking.name || 'N/A'}</p>
         <p class="tour-date"><strong>Tour Date:</strong> ${booking.tourDate ? new Date(booking.tourDate).toLocaleDateString('en-GB', options) : 'N/A'}</p>
-        <p class="tour-time"><strong>Tour Time:</strong> ${booking.tourTime}</p>
-        <p class="vehicle-type"><strong>Vehicle Type:</strong> ${booking.vehicleType}</p>
-        <p class="address"><strong>Address:</strong> ${booking.address}</p>
-        <p class="phone-number"><strong>Phone Number:</strong> ${booking.phoneNumber}</p>
-        <p class="specialRequirements"><strong>Special Requirements:</strong> ${booking.specialRequirements || 'N/A'}</p>
-        <p class="totalPassengers"><strong>Total Passengers:</strong> ${booking.totalPassengers}</p>
+        <p class="tour-time"><strong>Tour Time:</strong> ${booking.tourTime || 'N/A'}</p>
+        <p class="vehicle-type"><strong>Vehicle Type:</strong> ${booking.vehicleType || 'N/A'}</p>
+        <p class="address"><strong>Address:</strong> ${booking.address || 'N/A'}</p>
+        <p class="phone-number"><strong>Phone Number:</strong> ${booking.phoneNumber || 'N/A'}</p>
+        <p class="driver-name"><strong>Driver Name:</strong> ${booking.driverName || 'N/A'}</p>
+        <p class="earned"><strong>We earned:</strong> ${booking.earned || 'N/A'}</p>
+        <p class="driver-price"><strong>Driver Earned: $</strong> ${booking.driverPrice || 'N/A'}</p>
+        <p class="special-requirements"><strong>Special Requirements:</strong> ${booking.specialRequirements || 'N/A'}</p>
+        <p class="total-passengers"><strong>Total Passengers:</strong> ${booking.totalPassengers || 'N/A'}</p>
       </div>
     `;
-
+  
     container.insertAdjacentHTML('beforeend', bookingCard);
-
+  
     const totalBookingsElement = document.getElementById('totalBookings');
     totalBookingsElement.innerText = parseInt(totalBookingsElement.innerText) + 1;
   }
+  
 </script>
 
 <%- include('./layouts/footer') %>
