@@ -149,24 +149,42 @@ app.get('/semi_admin', isAuthenticated, authRole("semi_admin"), async (req, res)
 
 app.get('/Calender', isAuthenticated, authRole('admin'), async (req, res) => {
   try {
-    // Assuming you have a Booking model to fetch bookings
-    const bookings = await Booking.find({}).select('tourDate'); // Adjust fields as needed
+    const bookings = await Booking.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$tourDate" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } } // Sort by date
+    ]);
+
     res.render('calender', { bookings });
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching bookings:', error.message);
     res.render('calender', { bookings: [] });
   }
 });
+
 app.get('/Calenders', isAuthenticated, authRole('semi_admin'), async (req, res) => {
   try {
-    // Assuming you have a Booking model to fetch bookings
-    const bookings = await Booking.find({}).select('tourDate'); // Adjust fields as needed
+    const bookings = await Booking.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$tourDate" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } } // Sort by date
+    ]);
+
     res.render('calender', { bookings });
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching bookings:', error.message);
     res.render('calender', { bookings: [] });
   }
 });
+
 
 
 
@@ -504,7 +522,7 @@ mongoose
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
-      console.log(`https://localhost:${PORT}`);
+      console.log(`http://localhost:${PORT}`);
       
     });
   })
