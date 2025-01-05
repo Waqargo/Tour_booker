@@ -516,6 +516,9 @@ app.get('/generateReport', async (req, res) => {
       return res.status(404).send('No bookings found.');
     }
 
+    // Sort bookings by travel date (tourDate)
+    bookings.sort((a, b) => new Date(a.tourDate) - new Date(b.tourDate));
+
     // Initialize ExcelJS workbook and worksheet
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Bookings Report');
@@ -626,6 +629,7 @@ app.get('/generateReport', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 
