@@ -266,8 +266,8 @@ Total Passengers: ${totalPassengers}
     const options = { day: '2-digit', month: 'short', year: 'numeric' };
 
     const bookingCard = `
-      <div class="booking-card" id="booking-${booking._id}" style="border: 3px solid black; width: 100%; padding: 20px; border-radius: 20px; overflow-wrap: break-word;">
-        <div class="flow" style="display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 15px;">
+      <div class="booking-card" id="booking-${booking._id}" style="border: 3px solid white; width: 100%; padding: 20px; border-radius: 20px; overflow-wrap: break-word;">
+        <div class="flow" style="display: flex; justify-content: flex-end; flex-wrap: nowrap; gap: 15px;">
           <button onclick="copyBookingInfo('${booking._id}')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Copy</button>
           <button onclick="window.location.href='/editBooking/${booking._id}';" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Edit</button>
           <button onclick="deleteBooking('${booking._id}')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Delete</button>
