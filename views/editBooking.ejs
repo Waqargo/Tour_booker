@@ -60,7 +60,18 @@
               <input type="date" name="tourDate" value="<%= booking.tourDate ? booking.tourDate.toISOString().split('T')[0] : '' %>" required>
               <i>Tour Date</i>
             </div>
-
+            <div class="inputBox">
+              <input type="text" name="driverName" value="<%= booking.driverName || '' %>">
+              <i>Driver Name</i>
+            </div>
+            <div class="inputBox">
+              <input type="text" name="earned" value="<%= booking.earned || '' %>">
+              <i>Earned</i>
+            </div>
+            <div class="inputBox">
+              <input type="text" name="driverPrice" value="<%= booking.driverPrice || '' %>">
+              <i>Driver Price</i>
+            </div>
 
             <% if (user.role === 'driver') { %>
               
