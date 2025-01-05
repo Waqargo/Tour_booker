@@ -37,6 +37,11 @@
       font-weight: 600;
     }
 
+    .total-bookings {
+      font-size: 1rem;
+      color: #555;
+    }
+
     .icons {
       display: flex;
       gap: 10px;
@@ -158,7 +163,10 @@
   <div class="wrapper">
     <%- include('./layouts/header') %>
     <header>
-      <p class="current-date"></p>
+      <div>
+        <p class="current-date"></p>
+        <p class="total-bookings"></p>
+      </div>
       <div class="icons">
         <span id="prev" class="material-icons-outlined">chevron_left</span>
         <span id="next" class="material-icons-outlined">chevron_right</span>
@@ -201,6 +209,16 @@
         return bookingDate.getMonth() === month && bookingDate.getFullYear() === year;
       });
 
+      // Calculate total bookings for the current month
+      const totalBookings = currentBookings.reduce((sum, booking) => sum + booking.count, 0);
+
+      // Update the current date and total bookings
+      document.querySelector('.current-date').textContent = `${new Intl.DateTimeFormat('en-US', {
+        month: 'long',
+        year: 'numeric',
+      }).format(currentDate)}`;
+      document.querySelector('.total-bookings').textContent = `Total Bookings: ${totalBookings}`;
+
       for (let i = 0; i < firstDay.getDay(); i++) {
         const li = document.createElement('li');
         daysContainer.appendChild(li);
@@ -229,11 +247,6 @@
 
         daysContainer.appendChild(li);
       }
-
-      document.querySelector('.current-date').textContent = `${new Intl.DateTimeFormat('en-US', {
-        month: 'long',
-        year: 'numeric',
-      }).format(currentDate)}`;
     }
 
     document.querySelector('#prev').addEventListener('click', () => {
