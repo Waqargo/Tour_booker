@@ -61,6 +61,9 @@
           <p class="vehicle-type"><strong>Vehicle Type:</strong> <%= booking.vehicleType %></p>
           <p class="address"><strong>Address:</strong> <%= booking.address %></p>
           <p class="phone-number"><strong>Phone Number:</strong> <%= booking.phoneNumber %></p>
+          <p class="Driver Name"><strong>Driver Name:</strong> <%= booking.driverName || 'N/A' %></p>
+          <p class="earned"><strong>We earned:</strong> <%= booking.earned || 'N/A' %></p>
+          <p class="driverPrice"><strong>Driver Earned: $</strong> <%= booking.driverPrice || 'N/A' %></p>
           <p class="specialRequirements"><strong>Special Requirements:</strong> <%= booking.specialRequirements || 'N/A' %></p>
           <p class="totalPassengers"><strong>Total Passengers:</strong> <%= booking.totalPassengers %></p>
         </div>
