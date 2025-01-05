@@ -1,117 +1,297 @@
-<!doctype html>
+<%- include('./layouts/header') %>
 
-<html lang="en"> 
+<div class="contain" style="background-color: #222222; color: #9FBCC7; margin-top: -20px; padding: 20px;">
+  <h1>Bookings List</h1>
+  <h4>Total number of bookings: <span id="totalBookings"><%= totalBookings %></span></h4>
 
- <head> 
+  <!-- Buttons for actions -->
+  <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; gap: 10px;">
+    <button onclick="getTomorrowBookings()" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 50px; padding: 0 15px;">Tomorrow's Bookings</button>
+    <button onclick="toggleCustomDateRange()" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 50px; padding: 0 15px;">Custom Date Range</button>
+    <button onclick="refreshPage()" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 50px; padding: 0 15px;">Refresh Page</button>
+  </div>
 
-  <meta charset="UTF-8"> 
+  <!-- Custom Date Range Selection -->
+  <div id="custom-date-range" style="display: none; margin-bottom: 20px; text-align: center;">
+    <input type="date" id="start-date" style="padding: 10px; border-radius: 5px; border: 1px solid #aaa;" />
+    <input type="date" id="end-date" style="padding: 10px; border-radius: 5px; border: 1px solid #aaa;" />
+    <button onclick="getCustomBookings()" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 40px; padding: 0 15px;">Find Bookings</button>
+  </div>
 
-  <title>Add Bookings</title> 
+  <!-- Search Input -->
+  <div style="margin-bottom: 20px;width:90%">
+    <input 
+      type="text" 
+      id="search-input" 
+      placeholder="Search bookings..." 
+      oninput="searchBookings()" 
+      style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #aaa; border-radius: 5px;"
+    />
+  </div>
 
-  <link rel="stylesheet" href="css/addbooking.css"> 
+  <div class="bookings-container" style="width: 100%; gap: 20px;">
+    <% if (bookings.length === 0) { %>
+      <p>No bookings available.</p>
+    <% } else { %>
+      <% bookings.forEach(booking => { %>
+        <div 
+          class="booking-card" 
+          id="booking-<%= booking._id %>" 
+          data-booking='<%- JSON.stringify(booking) %>' 
+          style="border: 3px solid rgb(255, 255, 255); width: 100%; padding: 20px; border-radius: 20px; overflow-wrap: break-word;">
+          
+          <!-- Action Buttons -->
+          <% if (user.role === 'admin') { %>
+            <div class="flow" style="display: flex; justify-content: flex-end; flex-wrap: nowrap; gap: 15px;">
+              <button onclick="copyBookingInfo('<%= booking._id %>')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px; padding: 0 10px;">Copy</button>
+              <button onclick="window.location.href='/editBooking/<%= booking._id %>';" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px; padding: 0 10px;">Edit</button>
+              <button onclick="deleteBooking('<%= booking._id %>')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px; padding: 0 10px;">Delete</button>
+            </div>
+          <% } %>
 
- </head> 
+          <!-- Booking Details -->
+          <h4 class="tour"><strong>Tour:</strong> <%= booking.tour %></h4>
+          <p class="traveller-name"><strong>Traveller Name:</strong> <%= booking.name %></p>
+          <p class="tour-date"><strong>Tour Date:</strong> 
+            <%= booking.tourDate 
+                  ? new Date(booking.tourDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                  : 'N/A' %>
+          </p>
+          <p class="tour-time"><strong>Tour Time:</strong> <%= booking.tourTime %></p>
+          <p class="vehicle-type"><strong>Vehicle Type:</strong> <%= booking.vehicleType %></p>
+          <p class="address"><strong>Address:</strong> <%= booking.address %></p>
+          <p class="phone-number"><strong>Phone Number:</strong> <%= booking.phoneNumber %></p>
+          <p class="Driver Name"><strong>Driver Name:</strong> <%= booking.driverName || 'N/A' %></p>
+          <p class="earned"><strong>We earned:</strong> <%= booking.earned || 'N/A' %></p>
+          <p class="driverPrice"><strong>Driver Earned: $</strong> <%= booking.driverPrice || 'N/A' %></p>
+          <p class="specialRequirements"><strong>Special Requirements:</strong> <%= booking.specialRequirements || 'N/A' %></p>
+          <p class="totalPassengers"><strong>Total Passengers:</strong> <%= booking.totalPassengers %></p>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
 
- <body> <!-- partial:index.partial.html --> 
+<style>
+  /* Make the layout responsive */
+  @media (max-width: 768px) {
+    .contain {
+      padding: 15px;
+    }
 
-  <section> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> 
+    .bookings-container {
+      gap: 15px;
+    }
 
-    <div class="signin"> 
-        
-        <div class="content"> 
-            
-            <h2>Users details</h2> 
-            <div class="form"> 
-             <form action="/addBookings" method="POST">
-              <div class="inputBox">
-                <select name="tour" id="tour" required>
-                  <option value="" disabled selected>Select Tour</option>
-                  <option value="Mount Fuji">Mount Fuji</option>
-                  <option value="Nikko">Nikko</option>
-                  <option value="Tokyo">Tokyo</option>
-                </select>
-                <i></i> <!-- Optional icon or additional styling -->
-              </div>
-              
-                <div class="inputBox">
-                    <input type="text" name="name" required>
-                    <i>Name</i>
-                  </div>
-                  <div class="inputBox">
-                    <select name="vehicleType" required>
-                      <option value="" disabled selected>Select Vehicle Type</option>
-                      <option value="Minivan">Minivan</option>
-                      <option value="Hiace">Hiace</option>
-                      <option value="Prius">Prius</option>
-                      <option value="Prado">Prado</option>
-                      <option value="Luxury Car">Luxury Car</option>
-                    </select>
-                    <i></i>
-                  </div>
-                  
-                  <div class="inputBox">
-                    <input type="text" name="address" >
-                    <i>Address</i>
-                  </div>
-                  <div class="inputBox">
-                    <input type="text" name="specialRequirements" id="specialRequirements" >
-                    <i>Special Requirements</i>
-                  </div>
-                  
-                  
-                  <div class="inputBox">
-                    <input type="text" name="phoneNumber" required>
-                    <i>Phone Number</i>
-                  </div>
-                  
-                  <div class="inputBox">
-                    <input type="number" name="totalPassengers" id="totalPassengers" min="1" required>
-                    <i>Total Number of Passengers</i>
-                  </div>
-                  
-                  <div class="inputBox">
-                    <input type="date" name="tourDate" required> <i>  </i>
-                  </div>
+    .booking-card {
+      font-size: 14px;
+    }
 
+    .flow button {
+      width: 100%; /* Make buttons full width on small screens */
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
-                  <% if (user.role === 'driver') { %>
-                    
-                    <div class="inputBox">
-                      <input type="text" name="driverRequirement" > <i>Driver's Requirement</i>
-                    </div>
-                    
-                  <% } %>
-                  <div class="inputBox">
-                    <select name="tourTime" required>
-                      <option value="" disabled selected>Select Tour Time</option>
-                      <option value="06:00">6:00 AM</option>
-                      <option value="06:30">6:30 AM</option>
-                      <option value="07:00">7:00 AM</option>
-                      <option value="07:30">7:30 AM</option>
-                      <option value="08:00">8:00 AM</option>
-                      <option value="08:30">8:30 AM</option>
-                      <option value="09:00">9:00 AM</option>
-                    </select>
-                    <i></i>
-                  </div>
-                  <div class="inputBox">
-                    <input type="submit" value="Submit">
-                  </div>
-      </form>
-      <p style="color:white">
-        <a href="javascript:history.back()" style="color:white" class="back-link">Go Back</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="/" style="color:white" class="home-link">Go Home</a>
-      </p>
-      
-    </div>
-     </div> 
+    button {
+      font-size: 12px; /* Reduce font size for buttons */
+    }
 
-    </div> 
+    input[type="date"],
+    input[type="text"] {
+      font-size: 14px;
+      width: 100%; /* Full width for inputs on small screens */
+      margin-bottom: 10px;
+    }
+  }
 
-   </div> 
+  @media (max-width: 480px) {
+    
+    h4 {
+      font-size: 18px; /* Smaller font sizes for headers */
+    }
 
-  </section> <!-- partial --> 
+    .booking-card {
+      font-size: 12px; /* Further reduce font size for content */
+    }
+  }
+</style>
 
- </body>
+<script>
+  function searchBookings() {
+    const input = document.getElementById('search-input').value.toLowerCase();
+    const bookingCards = document.querySelectorAll('.booking-card');
 
-</html>
+    bookingCards.forEach(card => {
+      const booking = JSON.parse(card.dataset.booking);
+      const searchableText = `
+        ${booking.tour || ''} 
+        ${booking.name || ''} 
+        ${new Date(booking.tourDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) || ''} 
+        ${booking.vehicleType || ''} 
+        ${booking.address || ''} 
+        ${booking.phoneNumber || ''}
+      `.toLowerCase();
+
+      if (searchableText.includes(input)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function copyBookingInfo(bookingId) {
+    const bookingCard = document.getElementById(`booking-${bookingId}`);
+
+    const tour = bookingCard.querySelector('.tour').innerText.split(': ')[1];
+    const name = bookingCard.querySelector('.traveller-name').innerText.split(': ')[1];
+    const tourDate = bookingCard.querySelector('.tour-date').innerText.split(': ')[1];
+    const tourTime = bookingCard.querySelector('.tour-time').innerText.split(': ')[1];
+    const vehicleType = bookingCard.querySelector('.vehicle-type').innerText.split(': ')[1];
+    const address = bookingCard.querySelector('.address').innerText.split(': ')[1];
+    const phoneNumber = bookingCard.querySelector('.phone-number').innerText.split(': ')[1];
+    const specialRequirements = bookingCard.querySelector('.specialRequirements').innerText.split(': ')[1] || 'N/A';
+    const totalPassengers = bookingCard.querySelector('.totalPassengers').innerText.split(': ')[1];
+
+    const bookingInfo = `
+Tour: ${tour}
+Traveller Name: ${name}
+Tour Date: ${tourDate}
+Tour Time: ${tourTime}
+Vehicle Type: ${vehicleType}
+Address: ${address}
+Phone Number: ${phoneNumber}
+Special Requirements: ${specialRequirements}
+Total Passengers: ${totalPassengers}
+    `;
+
+    navigator.clipboard.writeText(bookingInfo).then(() => {
+      alert('Booking information copied to clipboard!');
+    }).catch(err => {
+      console.error('Could not copy text: ', err);
+    });
+  }
+
+  function deleteBooking(bookingId) {
+    if (confirm("Are you sure you want to delete this booking?")) {
+      fetch(`/deleteBooking/${bookingId}`, {
+        method: "DELETE",
+      })
+      .then((response) => {
+        if (response.ok) {
+          alert("Booking deleted successfully");
+          document.getElementById(`booking-${bookingId}`).remove();
+          updateBookingCount(-1);
+        } else {
+          alert("Error deleting booking");
+        }
+      })
+      .catch((err) => console.error("Error:", err));
+    }
+  }
+
+  function updateBookingCount(change) {
+    const totalBookingsElement = document.getElementById('totalBookings');
+    totalBookingsElement.innerText = parseInt(totalBookingsElement.innerText) + change;
+  }
+
+  function getTomorrowBookings() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const formattedDate = tomorrow.toISOString().split('T')[0];
+
+    fetch(`/getBookingsByDate/${formattedDate}`)
+      .then(response => response.json())
+      .then(bookings => {
+        clearBookings();
+        if (bookings.length === 0) {
+          document.querySelector('.bookings-container').innerHTML = '<h1>There are no bookings</h1>';
+          document.getElementById('totalBookings').innerText = '0';
+        } else {
+          bookings.forEach(booking => displayBooking(booking));
+        }
+      })
+      .catch(err => console.error('Error fetching bookings:', err));
+  }
+
+  function toggleCustomDateRange() {
+    const customDateRange = document.getElementById('custom-date-range');
+    customDateRange.style.display = customDateRange.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function getCustomBookings() {
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+
+    if (!startDate) {
+      alert("Please select a start date.");
+      return;
+    }
+
+    if (endDate && new Date(startDate) > new Date(endDate)) {
+      alert("The start date cannot be after the end date.");
+      return;
+    }
+
+    let url = `/getBookingsByDateRange?start=${startDate}`;
+    if (endDate) {
+      url += `&end=${endDate}`;
+    }
+
+    fetch(url)
+      .then(response => response.json())
+      .then(bookings => {
+        clearBookings();
+        if (bookings.length === 0) {
+          document.querySelector('.bookings-container').innerHTML = '<h1>There are no bookings</h1>';
+          document.getElementById('totalBookings').innerText = '0';
+        } else {
+          bookings.forEach(booking => displayBooking(booking));
+        }
+      })
+      .catch(err => console.error('Error fetching bookings:', err));
+  }
+
+  function clearBookings() {
+    const container = document.querySelector('.bookings-container');
+    container.innerHTML = '';
+    document.getElementById('totalBookings').innerText = '0';
+  }
+
+  function refreshPage() {
+    location.reload();
+  }
+
+  function displayBooking(booking) {
+    const container = document.querySelector('.bookings-container');
+
+    const options = { day: '2-digit', month: 'short', year: 'numeric' };
+
+    const bookingCard = `
+      <div class="booking-card" id="booking-${booking._id}" style="border: 3px solid white; width: 100%; padding: 20px; border-radius: 20px; overflow-wrap: break-word;">
+        <div class="flow" style="display: flex; justify-content: flex-end; flex-wrap: nowrap; gap: 15px;">
+          <button onclick="copyBookingInfo('${booking._id}')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Copy</button>
+          <button onclick="window.location.href='/editBooking/${booking._id}';" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Edit</button>
+          <button onclick="deleteBooking('${booking._id}')" style="border-radius: 9px; border: 1px solid #aaa; font-size: 14px; height: 33px;">Delete</button>
+        </div>
+        <h4 class="tour"><strong>Tour:</strong> ${booking.tour}</h4>
+        <p class="traveller-name"><strong>Traveller Name:</strong> ${booking.name}</p>
+        <p class="tour-date"><strong>Tour Date:</strong> ${booking.tourDate ? new Date(booking.tourDate).toLocaleDateString('en-GB', options) : 'N/A'}</p>
+        <p class="tour-time"><strong>Tour Time:</strong> ${booking.tourTime}</p>
+        <p class="vehicle-type"><strong>Vehicle Type:</strong> ${booking.vehicleType}</p>
+        <p class="address"><strong>Address:</strong> ${booking.address}</p>
+        <p class="phone-number"><strong>Phone Number:</strong> ${booking.phoneNumber}</p>
+        <p class="specialRequirements"><strong>Special Requirements:</strong> ${booking.specialRequirements || 'N/A'}</p>
+        <p class="totalPassengers"><strong>Total Passengers:</strong> ${booking.totalPassengers}</p>
+      </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', bookingCard);
+
+    const totalBookingsElement = document.getElementById('totalBookings');
+    totalBookingsElement.innerText = parseInt(totalBookingsElement.innerText) + 1;
+  }
+</script>
+
+<%- include('./layouts/footer') %>
