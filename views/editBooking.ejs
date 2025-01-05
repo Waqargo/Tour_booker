@@ -83,15 +83,18 @@
             <% } %>
 
             <div class="inputBox">
-              <select name="tourTime" >
-                <option value="" disabled>Select Tour Time</option>
-                <option value="07:00" <%= booking.tourTime === '07:00' ? 'selected' : '' %>>7:00 AM</option>
-                <option value="07:30" <%= booking.tourTime === '07:30' ? 'selected' : '' %>>7:30 AM</option>
-                <option value="08:00" <%= booking.tourTime === '08:00' ? 'selected' : '' %>>8:00 AM</option>
-                <option value="09:00" <%= booking.tourTime === '09:00' ? 'selected' : '' %>>9:00 AM</option>
-              </select>
-              <i></i>
-            </div>
+  <select name="tourTime">
+    <option value="" disabled>Select Tour Time</option>
+    <option value="06:00" <%= booking.tourTime === '06:00' ? 'selected' : '' %>>6:00 AM</option>
+    <option value="06:30" <%= booking.tourTime === '06:30' ? 'selected' : '' %>>6:30 AM</option>
+    <option value="07:00" <%= booking.tourTime === '07:00' ? 'selected' : '' %>>7:00 AM</option>
+    <option value="07:30" <%= booking.tourTime === '07:30' ? 'selected' : '' %>>7:30 AM</option>
+    <option value="08:00" <%= booking.tourTime === '08:00' ? 'selected' : '' %>>8:00 AM</option>
+    <option value="08:30" <%= booking.tourTime === '08:30' ? 'selected' : '' %>>8:30 AM</option>
+    <option value="09:00" <%= booking.tourTime === '09:00' ? 'selected' : '' %>>9:00 AM</option>
+  </select>
+  <i></i>
+</div>
             <div class="inputBox">
               <input type="submit" value="Update Booking">
             </div>
