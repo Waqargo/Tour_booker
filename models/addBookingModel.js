@@ -14,15 +14,10 @@
       required: false,
     },
     phoneNumber: {
-      type: String,
+      type: String, // Use String instead of Number to allow any format
       required: true,
-      validate: {
-          validator: function(v) {
-              return /^\+?[1-9]\d{1,14}$/.test(v); // Regex for international phone numbers
-          },
-          message: props => `${props.value} is not a valid phone number! Please include the country code.`
-      }
-  },
+    },
+    
     createdAt: {
       type: Date,
       default: Date.now,
