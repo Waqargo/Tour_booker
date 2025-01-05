@@ -10,6 +10,8 @@ const connectMongo = require("connect-mongo");
 const connectEnsureLogin = require("connect-ensure-login");
 const User = require('./models/userModel');
 const Booking = require('./models/addBookingModel');
+const ExcelJS = require('exceljs');
+
 const app = express();
 
 // Middleware
@@ -271,8 +273,6 @@ app.post('/addBookings', isAuthenticated, authRole('admin'), async (req, res, ne
 try {
   const { name, vehicleType, address, phoneNumber, tourDate, tourTime,tour, specialRequirements, totalPassengers } = req.body;
 
-  // Remove phone number validation and date validation
-  // The new booking will be created regardless of the input validity.
 
   const newBooking = new Booking({
     name,
@@ -382,8 +382,8 @@ app.get('/bookingsList', isAuthenticated, authRole('admin'), async (req, res, ne
 
     // Render the view with the filtered bookings
     res.render('bookingList', { 
-      bookings: bookings, // Pass all relevant bookings
-      totalBookings: bookings.length, // Total bookings count
+      bookings: bookings, 
+      totalBookings: bookings.length,
     });
   } catch (error) {
     console.error(error);
@@ -487,6 +487,146 @@ app.post('/updateBooking/:id', async (req, res) => {
     res.status(500).send('Error updating booking');
   }
 });
+
+
+app.get('/report', (req, res) => {
+  res.render('generateReport');
+});
+
+
+app.get('/generateReport', async (req, res) => {
+  try {
+    const { conversionRate, startDate, endDate } = req.query;
+
+    // Validate inputs
+    if (!conversionRate || !startDate || !endDate) {
+      return res.status(400).send('Invalid inputs.');
+    }
+
+    const rate = parseFloat(conversionRate); // Conversion rate (e.g., 0.0064)
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Fetch bookings within the date range
+    const bookings = await Booking.find({
+      tourDate: { $gte: start, $lte: end },
+    });
+
+    if (!bookings || bookings.length === 0) {
+      return res.status(404).send('No bookings found.');
+    }
+
+    // Initialize ExcelJS workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Bookings Report');
+
+    // Add headers
+    worksheet.columns = [
+      { header: 'Travel Date', key: 'travelDate', width: 15 },
+      { header: 'Driver Name', key: 'driverName', width: 20 },
+      { header: 'Traveler Name', key: 'travelerName', width: 20 },
+      { header: 'Vehicle', key: 'vehicle', width: 15 },
+      { header: 'Earning Price (USD)', key: 'earningPrice', width: 20 },
+      { header: "Driver's Payment (JPY)", key: 'driverPayment', width: 20 },
+    ];
+
+    // Wrap text in headers
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.alignment = { wrapText: true, horizontal: 'center', vertical: 'center' };
+    });
+
+    // Add data rows
+    let totalEarnings = 0;
+    let totalDriverPayments = 0;
+
+    bookings.forEach((booking) => {
+      const earningPrice = booking.earned ? parseFloat(booking.earned) : 0;
+      const driverPaymentJPY = booking.driverPrice ? parseFloat(booking.driverPrice) : 0;
+
+      totalEarnings += earningPrice;
+      totalDriverPayments += driverPaymentJPY;
+
+      worksheet.addRow({
+        travelDate: new Date(booking.tourDate).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: '2-digit',
+        }),
+        driverName: booking.driverName || 'N/A',
+        travelerName: booking.name,
+        vehicle: booking.vehicleType,
+        earningPrice: `$${earningPrice.toFixed(2)}`,
+        driverPayment: `¥${driverPaymentJPY.toFixed(2)}`,
+      });
+    });
+
+    // Add total row
+    const totalRow = worksheet.addRow({
+      travelDate: 'TOTAL',
+      earningPrice: `$${totalEarnings.toFixed(2)}`,
+      driverPayment: `¥${totalDriverPayments.toFixed(2)}`,
+    });
+
+    totalRow.eachCell((cell) => {
+      cell.font = { bold: true };
+    });
+
+    // Add USD conversion and profit calculation
+    const totalDriverPaymentInUSD = (totalDriverPayments * rate).toFixed(2);
+    const profit = (totalEarnings - totalDriverPaymentInUSD).toFixed(2);
+
+    worksheet.addRow({}); // Empty row
+    const conversionRow = worksheet.addRow({
+      travelDate: 'Total Driver Payment (USD)',
+      earningPrice: '',
+      driverPayment: `$${totalDriverPaymentInUSD}`,
+    });
+
+    const profitRow = worksheet.addRow({
+      travelDate: 'Profit (USD)',
+      earningPrice: '',
+      driverPayment: `$${profit}`,
+    });
+
+    conversionRow.eachCell((cell) => {
+      cell.font = { bold: true };
+    });
+
+    profitRow.eachCell((cell) => {
+      cell.font = { bold: true };
+    });
+
+    // Apply borders
+    worksheet.eachRow((row) => {
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      });
+    });
+
+    // Set response headers for download
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=BookingsReport.xlsx'
+    );
+
+    // Write Excel file to response
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error('Error generating report:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 
 
