@@ -45,7 +45,10 @@
       type: Number,
       required: false
       
-    }
+    },
+    driverName: String, 
+    earned: String, 
+    driverPrice: String,
   });
 
   const Booking = mongoose.model('Booking', BookingSchema);
