@@ -40,28 +40,27 @@
       <div class="container">
         <div class="row site-hero-inner justify-content-center align-items-center">
           <div class="col-md-10 text-center">
-            <% if (user.role === 'client') { %>
+            <% if (user && user.role === 'driver') { %>
+              <h1 class="heading mb-4" data-aos="fade-up">Welcome</h1>
+            <% } else if (user && user.role === 'client') { %>
               <h1 class="heading mb-4" data-aos="fade-up">Wait for the Admin To give you access</h1>
             <% } else { %>
               <h1 class="heading mb-4" data-aos="fade-up">Travel &amp; Tours</h1>
-            <% } %> 
+            <% } %>
+            
             <p class="sub-heading mb-5" data-aos="fade-up" data-aos-delay="100">
-              The Best website for data managemant
+              The Best website for data management
             </p>
             <p class="pt-4" data-aos="fade-up" data-aos-delay="100">
-              <% if (user) { %>
-                
-              <a href="/logout"  class="btn uppercase btn-outline-light d-sm-inline d-block py-3">Logout</a>
+              <% if (user.role === 'admin' || user.role === 'semi_admin'|| user.role === 'driver' ||user.role === 'client') { %>
+                <a href="/logout" class="btn uppercase btn-outline-light d-sm-inline d-block py-3">Logout</a>
               <% } else { %>
-                <!-- If user is not logged in -->
                 <a href="/login" class="btn uppercase btn-outline-light d-sm-inline d-block py-3">Login</a>
-               
-                </li>
               <% } %>
-
-            
+              
             </p>
           </div>
+          
         </div>
         <p data-aos="fade-up" data-aos-offset="-500"><a href="#next-section" class="scroll-down smoothscroll"> <span class="fa fa-play"></span> Scroll Down</a></p>
       </div>
