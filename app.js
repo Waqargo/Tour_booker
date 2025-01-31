@@ -187,6 +187,24 @@ app.get('/Calenders', isAuthenticated, authRole('semi_admin'), async (req, res) 
   }
 });
 
+app.get('/api/bookings', isAuthenticated, authRole('admin'), async (req, res) => {
+  try {
+      const bookings = await Booking.aggregate([
+          {
+              $group: {
+                  _id: { $dateToString: { format: "%Y-%m-%d", date: "$tourDate" } },
+                  count: { $sum: 1 }
+              }
+          },
+          { $sort: { _id: 1 } }
+      ]);
+
+      res.json(bookings);
+  } catch (error) {
+      console.error('Error fetching bookings:', error.message);
+      res.status(500).json([]);
+  }
+});
 
 
 
