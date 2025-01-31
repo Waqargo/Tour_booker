@@ -187,7 +187,7 @@ app.get('/Calenders', isAuthenticated, authRole('semi_admin'), async (req, res) 
   }
 });
 
-app.get('/api/bookings', isAuthenticated, authRole('admin'), async (req, res) => {
+app.get('/api/bookings', isAuthenticated, async (req, res) => {
   try {
       const bookings = await Booking.aggregate([
           {
