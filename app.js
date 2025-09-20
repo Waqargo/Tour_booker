@@ -82,6 +82,30 @@ app.get('/users', isAuthenticated, authRole("admin"), async (req, res, next) => 
   }
 });
 
+
+// Create an async function to handle the database query
+async function getAllBookings() {
+  try {
+    // Use the find() method on the Booking model
+    const allBookings = await Booking.find({});
+    // The `allBookings` variable will be an array containing all documents from the 'bookings' collection
+    console.log(allBookings); 
+    return allBookings;
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    throw error;
+  }
+}
+
+// Example usage within an Express route
+app.get('/api/bookings', async (req, res) => {
+  try {
+    const bookings = await Booking.find({});
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).send("Error fetching booking data.");
+  }
+});
 app.get('/user/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -151,41 +175,50 @@ app.get('/semi_admin', isAuthenticated, authRole("semi_admin"), async (req, res)
 
 app.get('/Calender', isAuthenticated, authRole('admin'), async (req, res) => {
   try {
-    const bookings = await Booking.aggregate([
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$tourDate" } },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { _id: 1 } } // Sort by date
-    ]);
+    const bookings = await Booking.find({});
 
-    res.render('calender', { bookings });
+    const bookingCounts = bookings.reduce((acc, booking) => {
+      const bookingDate = new Date(booking.tourDate);
+      const dateString = bookingDate.toISOString().split('T')[0];
+      acc[dateString] = (acc[dateString] || 0) + 1;
+      return acc;
+    }, {});
+
+    const calendarBookings = Object.keys(bookingCounts).map(date => ({
+      _id: date,
+      count: bookingCounts[date]
+    })).sort((a, b) => new Date(a._id) - new Date(b._id));
+
+    res.render('calender', { bookings: calendarBookings });
   } catch (error) {
     console.error('Error fetching bookings:', error.message);
     res.render('calender', { bookings: [] });
   }
 });
 
-app.get('/Calenders', isAuthenticated, authRole('semi_admin'), async (req, res) => {
+app.get('/Calenders', isAuthenticated, authRole('semi_admin'), async (req, res)  => {
   try {
-    const bookings = await Booking.aggregate([
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$tourDate" } },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { _id: 1 } } // Sort by date
-    ]);
+    const bookings = await Booking.find({});
 
-    res.render('calender', { bookings });
+    const bookingCounts = bookings.reduce((acc, booking) => {
+      const bookingDate = new Date(booking.tourDate);
+      const dateString = bookingDate.toISOString().split('T')[0];
+      acc[dateString] = (acc[dateString] || 0) + 1;
+      return acc;
+    }, {});
+
+    const calendarBookings = Object.keys(bookingCounts).map(date => ({
+      _id: date,
+      count: bookingCounts[date]
+    })).sort((a, b) => new Date(a._id) - new Date(b._id));
+
+    res.render('calender', { bookings: calendarBookings });
   } catch (error) {
     console.error('Error fetching bookings:', error.message);
     res.render('calender', { bookings: [] });
   }
 });
+
 
 app.get('/api/bookings', isAuthenticated, async (req, res) => {
   try {
@@ -387,32 +420,30 @@ app.get('/getBookingsByDateRange', async (req, res) => {
       res.status(500).json({ message: 'Internal Server Error' });
   }
 });
-
-
-
 app.get('/bookingsList', isAuthenticated, authRole('admin'), async (req, res, next) => {
   try {
+    const bookings = await Booking.find({});
+
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of today
+    today.setHours(0, 0, 0, 0);
 
-    // Fetch all bookings for today and any day after today, sorted by tourDate in ascending order
-    const bookings = await Booking.find({ tourDate: { $gte: today } }).sort({ tourDate: 1 });
+    const futureBookings = bookings.filter(booking => {
+      const bookingDate = new Date(booking.tourDate);
+      return bookingDate >= today;
+    });
 
-    // Render the view with the filtered bookings
     res.render('bookingList', { 
-      bookings: bookings, 
-      totalBookings: bookings.length,
+      bookings: futureBookings, 
+      totalBookings: futureBookings.length,
     });
   } catch (error) {
     console.error(error);
-    // Handle error by rendering an empty booking list
     res.render('bookingList', { 
       bookings: [], 
-      totalBookings: 0 // Return empty arrays on error
+      totalBookings: 0 
     });
   }
 });
-
 
 app.get('/bookingList', isAuthenticated, authRole('semi_admin'), async (req, res, next) => {
   try {
