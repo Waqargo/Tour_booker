@@ -52,6 +52,9 @@
           <!-- Booking Details -->
           <h4 class="tour"><strong>Tour:</strong> <%= booking.tour %></h4>
           <p class="traveller-name"><strong>Traveller Name:</strong> <%= booking.name %></p>
+          <p class="traveller-name"><strong>Booking Refernce:</strong>
+                <%= booking.booking_reference %>
+              </p>
           <p class="tour-date"><strong>Tour Date:</strong> 
             <%= booking.tourDate 
                   ? new Date(booking.tourDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -62,8 +65,8 @@
           <p class="address"><strong>Address:</strong> <%= booking.address %></p>
           <p class="phone-number"><strong>Phone Number:</strong> <%= booking.phoneNumber %></p>
           <p class="Driver Name"><strong>Driver Name:</strong> <%= booking.driverName || 'N/A' %></p>
-          <p class="earned"><strong>We earned: $</strong> <%= booking.earned || 'N/A' %></p>
-          <p class="driverPrice"><strong>Driver Earned: ¥</strong> <%= booking.driverPrice || 'N/A' %></p>
+          <p class="earned"><strong>We earned:</strong> <%= booking.earned || 'N/A' %></p>
+          <p class="driverPrice"><strong>Driver Earned: $</strong> <%= booking.driverPrice || 'N/A' %></p>
           <p class="specialRequirements"><strong>Special Requirements:</strong> <%= booking.specialRequirements || 'N/A' %></p>
           <p class="totalPassengers"><strong>Total Passengers:</strong> <%= booking.totalPassengers %></p>
         </div>
@@ -129,7 +132,6 @@
         ${booking.name || ''} 
         ${new Date(booking.tourDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) || ''} 
         ${booking.vehicleType || ''} 
-        ${booking.address || ''} 
         ${booking.phoneNumber || ''}
       `.toLowerCase();
 
@@ -283,8 +285,8 @@ Total Passengers: ${totalPassengers}
         <p class="address"><strong>Address:</strong> ${booking.address || 'N/A'}</p>
         <p class="phone-number"><strong>Phone Number:</strong> ${booking.phoneNumber || 'N/A'}</p>
         <p class="driver-name"><strong>Driver Name:</strong> ${booking.driverName || 'N/A'}</p>
-        <p class="earned"><strong>We earned: $</strong> ${booking.earned || 'N/A'}</p>
-        <p class="driver-price"><strong>Driver Earned: ¥</strong> ${booking.driverPrice || 'N/A'}</p>
+        <p class="earned"><strong>We earned:</strong> ${booking.earned || 'N/A'}</p>
+        <p class="driver-price"><strong>Driver Earned: $</strong> ${booking.driverPrice || 'N/A'}</p>
         <p class="special-requirements"><strong>Special Requirements:</strong> ${booking.specialRequirements || 'N/A'}</p>
         <p class="total-passengers"><strong>Total Passengers:</strong> ${booking.totalPassengers || 'N/A'}</p>
       </div>
