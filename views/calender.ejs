@@ -109,18 +109,18 @@
     }
 
     .booking-count {
-      background-color: #007bff;
-      color: #fff;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      position: absolute;
-      top: 5px;
-      right: 5px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    position: absolute;
+    top: 1px;
+    right: 5px;
     }
 
     @media (max-width: 768px) {
@@ -130,7 +130,7 @@
       }
 
       .days div {
-        padding: 8px;
+        padding: 21px 8px;
         font-size: 0.8em;
         min-height: 50px;
       }
@@ -167,99 +167,92 @@
   <script>
     let monthOffset = 0;
 
-    async function fetchBookings() {
-        try {
-            const response = await fetch('/api/bookings');
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error('Error fetching bookings:', error);
-            return [];
-        }
-    }
-
     async function populateCalendar() {
-        const bookings = await fetchBookings();
-        console.log("Updated Bookings:", bookings); // Debugging line
+      const daysContainer = document.querySelector('.days');
+      daysContainer.innerHTML = '';
 
-        const daysContainer = document.querySelector('.days');
-        daysContainer.innerHTML = '';
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+      const baseDate = new Date();
+      baseDate.setDate(1);
+      baseDate.setMonth(baseDate.getMonth() + monthOffset);
+      baseDate.setHours(0, 0, 0, 0);
 
-        const baseDate = new Date();
-        baseDate.setDate(1);
-        baseDate.setMonth(baseDate.getMonth() + monthOffset);
-        baseDate.setHours(0, 0, 0, 0);
+      const currentDate = new Date(baseDate);
+      const currentMonth = currentDate.getMonth();
+      const currentYear = currentDate.getFullYear();
+      const firstDay = new Date(currentYear, currentMonth, 1);
+      const lastDay = new Date(currentYear, currentMonth + 1, 0);
 
-        const currentDate = new Date(baseDate);
-        const month = currentDate.getMonth();
-        const year = currentDate.getFullYear();
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
+      // EJS variable passed from the server
+      const allBookings = <%- JSON.stringify(bookings) %>;
 
-        // Convert bookings into a Map for the selected month
-        const bookingMap = new Map();
-        let totalBookings = 0;
+      const bookingMap = new Map();
+      let totalBookings = 0;
 
-        bookings.forEach(booking => {
-            const bookingDate = new Date(booking._id);
-            const bookingYear = bookingDate.getFullYear();
-            const bookingMonth = bookingDate.getMonth();
-            
-            if (bookingYear === year && bookingMonth === month) {  // Only count for displayed month
-                const formattedDate = `${bookingYear}-${String(bookingMonth + 1).padStart(2, '0')}-${String(bookingDate.getDate()).padStart(2, '0')}`;
-                bookingMap.set(formattedDate, booking.count || 0);
-                totalBookings += booking.count || 0;  // Add to total bookings for displayed month
-            }
+      if (Array.isArray(allBookings)) {
+        allBookings.forEach(booking => {
+          // Explicitly create a UTC date object to prevent timezone issues
+          const bookingDate = new Date(booking._id + 'T00:00:00Z');
+          
+          // Use UTC methods for consistent month and year comparison
+          const bookingYear = bookingDate.getUTCFullYear();
+          const bookingMonth = bookingDate.getUTCMonth();
+          
+          if (bookingYear === currentYear && bookingMonth === currentMonth) {
+            const formattedDate = booking._id; // The _id is already in YYYY-MM-DD format
+            bookingMap.set(formattedDate, booking.count || 0);
+            totalBookings += booking.count || 0;
+          }
         });
+      }
 
-        // Update UI with correct month and total bookings
-        document.querySelector('.current-date').textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
-        document.querySelector('.total-bookings').textContent = `Total Bookings: ${totalBookings}`;
+      // Update UI with correct month and total bookings
+      document.querySelector('.current-date').textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
+      document.querySelector('.total-bookings').textContent = `Total Bookings: ${totalBookings}`;
 
-        // Fill empty slots before the first day of the month
-        for (let i = 0; i < firstDay.getDay(); i++) {
-            const emptyDiv = document.createElement('div');
-            emptyDiv.classList.add('empty');
-            daysContainer.appendChild(emptyDiv);
+      // Fill empty slots before the first day of the month
+      for (let i = 0; i < firstDay.getDay(); i++) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.classList.add('empty');
+        daysContainer.appendChild(emptyDiv);
+      }
+
+      // Populate days
+      for (let day = 1; day <= lastDay.getDate(); day++) {
+        const div = document.createElement('div');
+        div.textContent = day;
+
+        const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        if (bookingMap.has(dateString)) {
+          const bookingCount = bookingMap.get(dateString);
+          const span = document.createElement('span');
+          span.classList.add('booking-count');
+          span.textContent = bookingCount;
+          div.appendChild(span);
+
+          const bookingDate = new Date(dateString);
+          bookingDate.setHours(0, 0, 0, 0);
+          div.classList.add(bookingDate < today ? 'past' : 'pending');
         }
 
-        // Populate days
-        for (let day = 1; day <= lastDay.getDate(); day++) {
-            const div = document.createElement('div');
-            div.textContent = day;
-
-            const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            if (bookingMap.has(dateString)) {
-                const bookingCount = bookingMap.get(dateString);
-                const span = document.createElement('span');
-                span.classList.add('booking-count');
-                span.textContent = bookingCount;
-                div.appendChild(span);
-
-                const bookingDate = new Date(dateString);
-                bookingDate.setHours(0, 0, 0, 0);
-                div.classList.add(bookingDate < today ? 'past' : 'pending');
-            }
-
-            daysContainer.appendChild(div);
-        }
+        daysContainer.appendChild(div);
+      }
     }
 
     document.querySelector('#prev').addEventListener('click', () => {
-        monthOffset = Math.max(-12, monthOffset - 1);
-        populateCalendar();
+      monthOffset = Math.max(-12, monthOffset - 1);
+      populateCalendar();
     });
 
     document.querySelector('#next').addEventListener('click', () => {
-        monthOffset = Math.min(12, monthOffset + 1);
-        populateCalendar();
+      monthOffset = Math.min(12, monthOffset + 1);
+      populateCalendar();
     });
 
     document.addEventListener("DOMContentLoaded", populateCalendar);
-</script>
+  </script>
 
 </body>
 </html>
