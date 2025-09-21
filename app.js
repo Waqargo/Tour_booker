@@ -422,20 +422,37 @@ app.get('/getBookingsByDateRange', async (req, res) => {
 });
 app.get('/bookingsList', isAuthenticated, authRole('admin'), async (req, res, next) => {
   try {
-    const bookings = await Booking.find({});
-
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const futureBookings = bookings.filter(booking => {
-      const bookingDate = new Date(booking.tourDate);
-      return bookingDate >= today;
-    });
+    let futureBookings;
+
+    try {
+      // 🔹 Try filtering/sorting in MongoDB (works only if tourDate is a Date type)
+      futureBookings = await Booking.find({
+        tourDate: { $gte: today }
+      }).sort({ tourDate: 1 });
+
+      // If nothing comes back but bookings exist, maybe it's stored as String
+      if (futureBookings.length === 0) {
+        throw new Error("Probably tourDate is stored as string, fallback to JS parsing");
+      }
+    } catch (err) {
+      // 🔹 Fallback: fetch all and filter/sort manually
+      const bookings = await Booking.find({});
+      futureBookings = bookings
+        .filter(b => {
+          const date = new Date(b.tourDate);
+          return !isNaN(date) && date >= today;
+        })
+        .sort((a, b) => new Date(a.tourDate) - new Date(b.tourDate));
+    }
 
     res.render('bookingList', { 
       bookings: futureBookings, 
       totalBookings: futureBookings.length,
     });
+
   } catch (error) {
     console.error(error);
     res.render('bookingList', { 
@@ -445,28 +462,48 @@ app.get('/bookingsList', isAuthenticated, authRole('admin'), async (req, res, ne
   }
 });
 
+
 app.get('/bookingList', isAuthenticated, authRole('semi_admin'), async (req, res, next) => {
   try {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of today
+    today.setHours(0, 0, 0, 0); // Start of today
 
-    // Fetch all bookings for today and any day after today, sorted by tourDate in ascending order
-    const bookings = await Booking.find({ tourDate: { $gte: today } }).sort({ tourDate: 1 });
+    let bookings;
 
-    // Render the view with the filtered bookings
+    try {
+      // 🔹 Try MongoDB filter/sort (works if tourDate is a Date type)
+      bookings = await Booking.find({
+        tourDate: { $gte: today }
+      }).sort({ tourDate: 1 });
+
+      if (bookings.length === 0) {
+        throw new Error("tourDate may be stored as String, using JS fallback");
+      }
+    } catch (err) {
+      // 🔹 Fallback: filter/sort in JS if tourDate is stored as String
+      const allBookings = await Booking.find({});
+      bookings = allBookings
+        .filter(b => {
+          const date = new Date(b.tourDate);
+          return !isNaN(date) && date >= today;
+        })
+        .sort((a, b) => new Date(a.tourDate) - new Date(b.tourDate));
+    }
+
     res.render('bookingsList', { 
-      bookings: bookings, // Pass all relevant bookings
-      totalBookings: bookings.length, // Total bookings count
+      bookings,
+      totalBookings: bookings.length,
     });
+
   } catch (error) {
     console.error(error);
-    // Handle error by rendering an empty booking list
     res.render('bookingsList', { 
-      bookings: [], 
-      totalBookings: 0 // Return empty arrays on error
+      bookings: [],
+      totalBookings: 0,
     });
   }
 });
+
 app.get('/Driver_BookingList', isAuthenticated, authRole('driver'), async (req, res, next) => {
   try {
     const today = new Date();
