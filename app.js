@@ -716,14 +716,6 @@ app.get('/generateReport', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-const HOST = "0.0.0.0";
-
-app.listen(PORT, HOST, () => {
-  console.log(`Server running at http://${HOST}:${PORT}`);
-});
-
-
 
 
 
@@ -746,8 +738,9 @@ app.use((error, req, res, next) => {
     next(error);
   }
 });
+const PORT = process.env.PORT || 3000;
+const HOST = "0.0.0.0";
 
-// MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -755,14 +748,11 @@ mongoose
   })
   .then(() => {
     console.log("MongoDB connected successfully");
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-      console.log(`http://localhost:${PORT}`);
-      
+
+    app.listen(PORT, HOST, () => {
+      console.log(`Server running at http://${HOST}:${PORT}`);
     });
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
   });
-
