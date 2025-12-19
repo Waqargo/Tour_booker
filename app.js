@@ -23,8 +23,8 @@ app.use(express.urlencoded({ extended: false }));
 
 const MongoStore = connectMongo.create({
   mongoUrl: process.env.MONGO_URI,
-  mongooseConnection: mongoose.connection,
 });
+
 
 app.use(
   session({
@@ -756,3 +756,4 @@ mongoose
   .catch((err) => {
     console.error("MongoDB connection error:", err);
   });
+
